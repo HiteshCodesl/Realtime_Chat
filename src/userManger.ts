@@ -1,4 +1,6 @@
 import type { connection } from "websocket";
+import type { messagePayload } from "./messages/outgoingMessage.js";
+import { OutGoingMessage, SupportedMessage } from "./messages/outgoingMessage.js";
 
 interface User{
     id: string,
@@ -43,5 +45,23 @@ export class UserManager{
         const user = this.rooms.get(roomId)?.users.find((x) => x.id === userId);
 
         return user ?? null;
+    }
+
+    broadCast(roomId: string, message: OutGoingMessage, userId: string){
+        const user = this.getUser(userId, roomId);
+
+        if(!user){
+            return;
+        }
+
+        const room = this.rooms.get(roomId);
+
+        if(!room){
+           return;
+        }
+
+        room.users.forEach((u) => {
+            u.socket.sendUTF(JSON.stringify(message));
+        })
     }
 }
