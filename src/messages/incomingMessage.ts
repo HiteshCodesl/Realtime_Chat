@@ -1,19 +1,19 @@
 import z from "zod"
 
-export enum SupportedMessage {
+export enum SupportedIncomingMessage {
     JoinRoom = "JOIN_ROOM",
     SendMessage = "CHAT_MESSAGE",
     UpvoteMessage = "UPVOTE_MESSAGE"
 }
 
 export type IncomingMessageType = {
-    type: SupportedMessage.JoinRoom,
+    type: SupportedIncomingMessage.JoinRoom,
     payload: initMessageType
 } | {
-    type: SupportedMessage.SendMessage,
+    type: SupportedIncomingMessage.SendMessage,
     payload: userMessageType
 } | {
-    type: SupportedMessage.UpvoteMessage,
+    type: SupportedIncomingMessage.UpvoteMessage,
     payload: upvoteMessageType
 }
 
@@ -28,7 +28,8 @@ type initMessageType =  z.infer<typeof initMessage>;
 export const userMessage = z.object({
     userId: z.string(),
     roomId: z.string(),
-    message: z.string()
+    message: z.string(),
+    chatId: z.string()
 })
 
 type userMessageType =  z.infer<typeof userMessage>;
@@ -36,7 +37,8 @@ type userMessageType =  z.infer<typeof userMessage>;
 export const upvoteMessage = z.object({
     userId: z.string(),
     chatId: z.string(),
-    roomId: z.string()
+    roomId: z.string(),
+    message: z.string()
 })
 
 type upvoteMessageType =  z.infer<typeof upvoteMessage>;
