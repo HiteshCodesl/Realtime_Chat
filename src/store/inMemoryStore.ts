@@ -1,3 +1,4 @@
+import { messagePayload } from "../messages/outgoingMessage.js";
 import { Store, type Chat, type UserId } from "./store.js";
 
 export let globalChatId: number = 1;
@@ -36,33 +37,35 @@ export class InMemoryStore implements Store{
         const room = this.store.get(roomId);
 
         if(!room){
-            return "Room Not Found"
+            return;
         }
 
-        room?.chats.push({
+        const chat = {
             id: (globalChatId++).toString(),
             userId,
             message,
             roomId,
             upvotes: []
-        });
+        };
+
+        room.chats.push(chat);
+
+        return chat;
     }
 
     upvote(roomId: string, chatId: string, userId: UserId){
         const room = this.store.get(roomId);
 
         if(!room){
-            return "Room Not Found"
+            return;
         }
 
-        const chat = room?.chats.find(x => x.id === chatId);
+        const chat = room.chats.find(x => x.id === chatId);
 
-        if(!chat){
-            return "Chat Not Found"
+        if(chat){
+           chat.upvotes.push(userId);
         }
-
-        chat.upvotes.push(userId);
-
-        return "Upvoted SuccessFully"
+        
+        return chat;
     }
 }
