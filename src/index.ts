@@ -24,28 +24,18 @@ const wsServer = new WebSocketServer({
 });
 
 
-function originIsAllowed(origin: string) {
-   
-  return true;
-}
-
 wsServer.on('request', function(request) {
-    if (!originIsAllowed(request.origin)) {
-
-      request.reject();
-      console.log((new Date()) + ' Connection from origin ' + request.origin + ' rejected.');
-      return;
-    }
-
     
-    var connection = request.accept('echo-protocol', request.origin);
+    var connection = request.accept(null, request.origin);
     console.log((new Date()) + ' Connection accepted.');
     connection.on('message', function(message) {
+        console.log("received message", message);
         if (message.type === 'utf8') {
             try{
                 messageHandler(connection, JSON.parse(message.utf8Data) )
             }catch(e){
-                
+                console.error("Error Occured", e);
+                return;
             }
         }
         else if (message.type === 'binary') {
@@ -55,16 +45,20 @@ wsServer.on('request', function(request) {
     });
     connection.on('close', function(reasonCode, description) {
         console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
+        return;
     });
 });
 
 function messageHandler(socket: connection, message: IncomingMessageType){
     if(message.type === SupportedIncomingMessage.JoinRoom){
+        console.log("Joined Room", message.payload)
         const payload = message.payload;
         userManager.addUser(payload.userId , payload.name, payload.roomId, socket)
+        storeManager.initRoom(payload.roomId);
     }
 
     if(message.type === SupportedIncomingMessage.SendMessage){
+        console.log("Message received", message.payload);
         const payload = message.payload;
 
         const user = userManager.getUser(payload.userId, payload.roomId);
@@ -97,9 +91,10 @@ function messageHandler(socket: connection, message: IncomingMessageType){
     if(message.type === SupportedIncomingMessage.UpvoteMessage){
         const payload = message.payload;
         
-        const chat = storeManager.upvote(payload.roomId, payload.chatId, payload.userId)
+        const chat = storeManager.upvote(payload.roomId, payload.chatId, payload.userId);
 
         if(!chat){
+            console.error("chatId Not Found");
             return;
         }
 
@@ -111,6 +106,6 @@ function messageHandler(socket: connection, message: IncomingMessageType){
                 upvotes: chat.upvotes.length,
             }
         }
-         userManager.broadCast(payload.roomId, outgoingPayloadMessage, payload.userId )
+         userManager.broadCast(payload.roomId, outgoingPayloadMessage, payload.userId);
     }
 }
