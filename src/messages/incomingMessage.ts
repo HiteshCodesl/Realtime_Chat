@@ -29,7 +29,6 @@ export const userMessage = z.object({
     userId: z.string(),
     roomId: z.string(),
     message: z.string(),
-    chatId: z.string()
 })
 
 type userMessageType =  z.infer<typeof userMessage>;
@@ -38,7 +37,6 @@ export const upvoteMessage = z.object({
     userId: z.string(),
     chatId: z.string(),
     roomId: z.string(),
-    message: z.string()
 })
 
 type upvoteMessageType =  z.infer<typeof upvoteMessage>;

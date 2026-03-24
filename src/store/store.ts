@@ -9,7 +9,6 @@ export interface Chat{
   upvotes: UserId[];
 }
 
-
 export abstract class Store{
     constructor(){
 

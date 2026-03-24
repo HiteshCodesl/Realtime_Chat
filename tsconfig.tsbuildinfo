@@ -1,0 +1,1 @@
+{"root":["./src/index.ts","./src/usermanger.ts","./src/messages/incomingmessage.ts","./src/messages/outgoingmessage.ts","./src/store/inmemorystore.ts","./src/store/store.ts"],"version":"5.9.3"}
